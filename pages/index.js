@@ -1,4 +1,5 @@
 import React from 'react';
+//import ReactGA from 'react-ga';
 import Head from 'next/head';
 import Lottie from 'react-lottie';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
@@ -87,6 +88,9 @@ const useStyles = makeStyles(theme => ({
     [theme.breakpoints.down('sm')]: {
       padding: 25,
     },
+    [theme.breakpoints.down('xs')]: {
+      padding: 5,
+    },
   },
   revolutionBackground: {
     backgroundImage: `url('/assets/repeatingBackground.svg')`,
@@ -174,7 +178,13 @@ export default function LandingPage(props) {
                   href='/estimate'
                   className={classes.estimateButton}
                   variant='contained'
-                  onClick={() => props.setValue(5)}
+                  onClick={() => {
+                    props.setValue(5);
+                    //ReactGA.event({
+                    //  category: 'Estimate',
+                    //  action: 'Home Page Pressed',
+                    //});
+                  }}
                 >
                   Free Estimate
                 </Button>
@@ -203,7 +213,6 @@ export default function LandingPage(props) {
         </Grid>
       </Grid>
       <Grid item>
-        {' '}
         {/*-----Custom Software Block-----*/}
         <Grid
           container
@@ -223,7 +232,7 @@ export default function LandingPage(props) {
               Save Energy. Save Time. Save Money.
             </Typography>
             <Typography variant='subtitle1'>
-              Complete digital solutions, from investigation to{' '}
+              Complete digital solutions, from investigation to
               <span className={classes.specialText}>celebration.</span>
             </Typography>
             <Button
@@ -254,7 +263,6 @@ export default function LandingPage(props) {
         </Grid>
       </Grid>
       <Grid item>
-        {' '}
         {/*-----iOS/Android Block-----*/}
         <Grid
           container
@@ -304,7 +312,6 @@ export default function LandingPage(props) {
         </Grid>
       </Grid>
       <Grid item>
-        {' '}
         {/*-----Websites Block-----*/}
         <Grid
           container
@@ -324,7 +331,8 @@ export default function LandingPage(props) {
               Reach More. Discover More. Sell More.
             </Typography>
             <Typography variant='subtitle1'>
-              Optimized for Search Engines, built for speed.
+              Optimized for Search Engines, {matchesXS && <br />}built for
+              speed.
             </Typography>
             <Button
               component={Link}
@@ -458,7 +466,7 @@ export default function LandingPage(props) {
                   Contact Us
                 </Typography>
                 <Typography variant='subtitle2'>
-                  Say hello!{' '}
+                  Say hello!
                   <span role='img' aria-label='waving hand'>
                     👋🏻
                   </span>

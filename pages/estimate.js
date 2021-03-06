@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+//import ReactGA from 'react-ga';
 import Head from 'next/head';
 import axios from 'axios';
-import Lottie from 'react-lottie';
 import { cloneDeep } from 'lodash';
+import Lottie from 'react-lottie';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
-
 import Grid from '@material-ui/core/Grid';
-import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
+import TextField from '@material-ui/core/TextField';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import Hidden from '@material-ui/core/Hidden';
 import Snackbar from '@material-ui/core/Snackbar';
@@ -32,7 +32,9 @@ const useStyles = makeStyles(theme => ({
     width: 225,
     fontSize: '1.25rem',
     marginTop: '5em',
-    '&:hover': { backgroundColor: theme.palette.secondary.light },
+    '&:hover': {
+      backgroundColor: theme.palette.secondary.light,
+    },
   },
   message: {
     border: `2px solid ${theme.palette.common.blue}`,
@@ -42,9 +44,9 @@ const useStyles = makeStyles(theme => ({
   },
   specialText: {
     fontFamily: 'Raleway',
-    color: theme.palette.common.orange,
-    fontSize: '1.5rem',
     fontWeight: 700,
+    fontSize: '1.5rem',
+    color: theme.palette.common.orange,
   },
 }));
 
@@ -68,7 +70,7 @@ const defaultQuestions = [
         title: 'iOS/Android App Development',
         subtitle: null,
         icon: '/assets/mobile.svg',
-        iconAlt: 'outlines of phones and tablets',
+        iconAlt: 'phones and tablet outline',
         selected: false,
         cost: 0,
       },
@@ -86,40 +88,7 @@ const defaultQuestions = [
 ];
 
 const softwareQuestions = [
-  {
-    id: 1,
-    title: 'Which service are you interested in?',
-    active: false,
-    options: [
-      {
-        id: 1,
-        title: 'Custom Software Development',
-        subtitle: null,
-        icon: '/assets/software.svg',
-        iconAlt: 'three floating screens',
-        selected: false,
-        cost: 0,
-      },
-      {
-        id: 2,
-        title: 'iOS/Android App Development',
-        subtitle: null,
-        icon: '/assets/mobile.svg',
-        iconAlt: 'outlines of phones and tablets',
-        selected: false,
-        cost: 0,
-      },
-      {
-        id: 3,
-        title: 'Website Development',
-        subtitle: null,
-        icon: '/assets/website.svg',
-        iconAlt: 'computer outline',
-        selected: false,
-        cost: 0,
-      },
-    ],
-  },
+  { ...defaultQuestions[0], active: false },
   {
     id: 2,
     title: 'Which platforms do you need supported?',
@@ -132,7 +101,7 @@ const softwareQuestions = [
         icon: '/assets/website.svg',
         iconAlt: 'computer outline',
         selected: false,
-        cost: 1000,
+        cost: 100,
       },
       {
         id: 2,
@@ -141,7 +110,7 @@ const softwareQuestions = [
         icon: '/assets/iphone.svg',
         iconAlt: 'outline of iphone',
         selected: false,
-        cost: 1000,
+        cost: 100,
       },
       {
         id: 3,
@@ -150,7 +119,7 @@ const softwareQuestions = [
         icon: '/assets/android.svg',
         iconAlt: 'outlines of android phone',
         selected: false,
-        cost: 1000,
+        cost: 100,
       },
     ],
     active: true,
@@ -167,7 +136,7 @@ const softwareQuestions = [
         icon: '/assets/camera.svg',
         iconAlt: 'camera outline',
         selected: false,
-        cost: 250,
+        cost: 25,
       },
       {
         id: 2,
@@ -176,7 +145,7 @@ const softwareQuestions = [
         icon: '/assets/gps.svg',
         iconAlt: 'gps pin',
         selected: false,
-        cost: 250,
+        cost: 25,
       },
       {
         id: 3,
@@ -185,7 +154,7 @@ const softwareQuestions = [
         icon: '/assets/upload.svg',
         iconAlt: 'outline of cloud with arrow pointing up',
         selected: false,
-        cost: 250,
+        cost: 25,
       },
     ],
     active: false,
@@ -199,10 +168,10 @@ const softwareQuestions = [
         id: 1,
         title: 'Users/Authentication',
         subtitle: null,
-        icon: '/assets/user.svg',
+        icon: '/assets/users.svg',
         iconAlt: 'outline of a person with a plus sign',
         selected: false,
-        cost: 250,
+        cost: 25,
       },
       {
         id: 2,
@@ -211,7 +180,7 @@ const softwareQuestions = [
         icon: '/assets/biometrics.svg',
         iconAlt: 'fingerprint',
         selected: false,
-        cost: 250,
+        cost: 25,
       },
       {
         id: 3,
@@ -220,7 +189,7 @@ const softwareQuestions = [
         icon: '/assets/bell.svg',
         iconAlt: 'outline of a bell',
         selected: false,
-        cost: 250,
+        cost: 25,
       },
     ],
     active: false,
@@ -237,7 +206,7 @@ const softwareQuestions = [
         icon: '/assets/info.svg',
         iconAlt: "'i' inside a circle",
         selected: false,
-        cost: 250,
+        cost: 25,
       },
       {
         id: 2,
@@ -246,7 +215,7 @@ const softwareQuestions = [
         icon: '/assets/customized.svg',
         iconAlt: 'two toggle switches',
         selected: false,
-        cost: 500,
+        cost: 50,
       },
       {
         id: 3,
@@ -255,7 +224,7 @@ const softwareQuestions = [
         icon: '/assets/data.svg',
         iconAlt: 'outline of line graph',
         selected: false,
-        cost: 1000,
+        cost: 100,
       },
     ],
     active: false,
@@ -281,7 +250,7 @@ const softwareQuestions = [
         icon: '/assets/persons.svg',
         iconAlt: 'outline of two people',
         selected: false,
-        cost: 1.125,
+        cost: 1.25,
       },
       {
         id: 3,
@@ -290,7 +259,7 @@ const softwareQuestions = [
         icon: '/assets/people.svg',
         iconAlt: 'outline of three people',
         selected: false,
-        cost: 1.25,
+        cost: 1.5,
       },
     ],
     active: false,
@@ -298,40 +267,7 @@ const softwareQuestions = [
 ];
 
 const websiteQuestions = [
-  {
-    id: 1,
-    title: 'Which service are you interested in?',
-    active: false,
-    options: [
-      {
-        id: 1,
-        title: 'Custom Software Development',
-        subtitle: null,
-        icon: '/assets/software.svg',
-        iconAlt: 'three floating screens',
-        selected: false,
-        cost: 0,
-      },
-      {
-        id: 2,
-        title: 'iOS/Android App Development',
-        subtitle: null,
-        icon: '/assets/mobile.svg',
-        iconAlt: 'outlines of phones and tablets',
-        selected: false,
-        cost: 0,
-      },
-      {
-        id: 3,
-        title: 'Website Development',
-        subtitle: null,
-        icon: '/assets/website.svg',
-        iconAlt: 'computer outline',
-        selected: false,
-        cost: 0,
-      },
-    ],
-  },
+  { ...defaultQuestions[0], active: false },
   {
     id: 2,
     title: 'Which type of website are you wanting?',
@@ -344,7 +280,7 @@ const websiteQuestions = [
         icon: '/assets/info.svg',
         iconAlt: 'person outline',
         selected: false,
-        cost: 1000,
+        cost: 100,
       },
       {
         id: 2,
@@ -353,7 +289,7 @@ const websiteQuestions = [
         icon: '/assets/customized.svg',
         iconAlt: 'outline of two people',
         selected: false,
-        cost: 2000,
+        cost: 200,
       },
       {
         id: 3,
@@ -362,7 +298,7 @@ const websiteQuestions = [
         icon: '/assets/globe.svg',
         iconAlt: 'outline of three people',
         selected: false,
-        cost: 2500,
+        cost: 250,
       },
     ],
     active: true,
@@ -372,28 +308,33 @@ const websiteQuestions = [
 export default function Estimate() {
   const classes = useStyles();
   const theme = useTheme();
-
   const matchesMD = useMediaQuery(theme.breakpoints.down('md'));
   const matchesSM = useMediaQuery(theme.breakpoints.down('sm'));
   const matchesXS = useMediaQuery(theme.breakpoints.down('xs'));
+
+  const myRef = useRef(null);
 
   const [questions, setQuestions] = useState(defaultQuestions);
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const [name, setName] = useState('');
+
   const [email, setEmail] = useState('');
   const [emailHelper, setEmailHelper] = useState('');
+
   const [phone, setPhone] = useState('');
   const [phoneHelper, setPhoneHelper] = useState('');
+
   const [message, setMessage] = useState('');
 
   const [total, setTotal] = useState(0);
-  const [service, setService] = useState('');
+
+  const [service, setService] = useState([]);
   const [platforms, setPlatforms] = useState([]);
   const [features, setFeatures] = useState([]);
   const [customFeatures, setCustomFeatures] = useState('');
-  const [users, setUsers] = useState('');
   const [category, setCategory] = useState('');
+  const [users, setUsers] = useState('');
 
   const [loading, setLoading] = useState(false);
 
@@ -405,16 +346,18 @@ export default function Estimate() {
 
   const defaultOptions = {
     loop: true,
-    autoplay: true,
+    autoplay: false,
     animationData: estimateAnimation,
-    renderSettings: {
+    rendererSettings: {
       preserveAspectRatio: 'xMidYMid slice',
     },
   };
 
   const nextQuestion = () => {
+    if (matchesXS) {
+      window.scrollTo(0, myRef.current.offsetTop + 75);
+    }
     const newQuestions = cloneDeep(questions);
-
     const currentlyActive = newQuestions.filter(question => question.active);
     const activeIndex = currentlyActive[0].id - 1;
     const nextIndex = activeIndex + 1;
@@ -424,9 +367,12 @@ export default function Estimate() {
 
     setQuestions(newQuestions);
   };
-  const previousQuestion = () => {
-    const newQuestions = cloneDeep(questions);
 
+  const previousQuestion = () => {
+    if (matchesXS) {
+      window.scrollTo(0, myRef.current.offsetTop + 75);
+    }
+    const newQuestions = cloneDeep(questions);
     const currentlyActive = newQuestions.filter(question => question.active);
     const activeIndex = currentlyActive[0].id - 1;
     const nextIndex = activeIndex - 1;
@@ -439,14 +385,17 @@ export default function Estimate() {
 
   const navigationPreviousDisabled = () => {
     const currentlyActive = questions.filter(question => question.active);
+
     if (currentlyActive[0].id === 1) {
       return true;
     } else {
       return false;
     }
   };
+
   const navigationNextDisabled = () => {
     const currentlyActive = questions.filter(question => question.active);
+
     if (currentlyActive[0].id === questions[questions.length - 1].id) {
       return true;
     } else {
@@ -456,12 +405,10 @@ export default function Estimate() {
 
   const handleSelect = id => {
     const newQuestions = cloneDeep(questions);
-
     const currentlyActive = newQuestions.filter(question => question.active);
     const activeIndex = currentlyActive[0].id - 1;
 
     const newSelected = newQuestions[activeIndex].options[id - 1];
-
     const previousSelected = currentlyActive[0].options.filter(
       option => option.selected
     );
@@ -480,6 +427,9 @@ export default function Estimate() {
 
     switch (newSelected.title) {
       case 'Custom Software Development':
+        if (matchesXS) {
+          window.scrollTo(0, myRef.current.offsetTop + 75);
+        }
         setQuestions(softwareQuestions);
         setService(newSelected.title);
         setPlatforms([]);
@@ -489,6 +439,9 @@ export default function Estimate() {
         setUsers('');
         break;
       case 'iOS/Android App Development':
+        if (matchesXS) {
+          window.scrollTo(0, myRef.current.offsetTop + 75);
+        }
         setQuestions(softwareQuestions);
         setService(newSelected.title);
         setPlatforms([]);
@@ -496,9 +449,11 @@ export default function Estimate() {
         setCustomFeatures('');
         setCategory('');
         setUsers('');
-
         break;
       case 'Website Development':
+        if (matchesXS) {
+          window.scrollTo(0, myRef.current.offsetTop + 75);
+        }
         setQuestions(websiteQuestions);
         setService(newSelected.title);
         setPlatforms([]);
@@ -506,7 +461,6 @@ export default function Estimate() {
         setCustomFeatures('');
         setCategory('');
         setUsers('');
-
         break;
       default:
         setQuestions(newQuestions);
@@ -522,8 +476,9 @@ export default function Estimate() {
         valid = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(
           event.target.value
         );
+
         if (!valid) {
-          setEmailHelper('Invalid Email');
+          setEmailHelper('Invalid email');
         } else {
           setEmailHelper('');
         }
@@ -533,8 +488,9 @@ export default function Estimate() {
         valid = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/.test(
           event.target.value
         );
+
         if (!valid) {
-          setPhoneHelper('Invalid Phone');
+          setPhoneHelper('Invalid phone');
         } else {
           setPhoneHelper('');
         }
@@ -543,13 +499,13 @@ export default function Estimate() {
         break;
     }
   };
+
   const getTotal = () => {
     let cost = 0;
 
     const selections = questions
       .map(question => question.options.filter(option => option.selected))
       .filter(question => question.length > 0);
-    console.log(selections);
 
     selections.map(options => options.map(option => (cost += option.cost)));
 
@@ -560,7 +516,6 @@ export default function Estimate() {
           question.options.filter(option => option.selected)
         )[0][0];
 
-      console.log(userCost);
       setUsers(userCost.title);
 
       cost -= userCost.cost;
@@ -568,13 +523,12 @@ export default function Estimate() {
     }
 
     setTotal(cost);
-    console.log(cost);
   };
 
   const getPlatforms = () => {
-    if (questions.length > 2) {
-      let newPlatforms = [];
+    let newPlatforms = [];
 
+    if (questions.length > 2) {
       questions
         .filter(
           question =>
@@ -588,8 +542,9 @@ export default function Estimate() {
   };
 
   const getFeatures = () => {
+    let newFeatures = [];
+
     if (questions.length > 2) {
-      let newFeatures = [];
       questions
         .filter(
           question => question.title === 'Which features do you expect to use?'
@@ -634,6 +589,11 @@ export default function Estimate() {
 
   const sendEstimate = () => {
     setLoading(true);
+    //ReactGA.event({
+    //  category: 'Estimate',
+    //  action: 'Estimate Sent',
+    //});
+
     axios
       .get(
         'https://us-central1-material-ui-course-ab7cb.cloudfunctions.net/sendMail',
@@ -645,6 +605,7 @@ export default function Estimate() {
             message: message,
             total: total,
             category: category,
+            service: service,
             platforms: platforms,
             features: features,
             customFeatures: customFeatures,
@@ -662,7 +623,7 @@ export default function Estimate() {
         setDialogOpen(false);
       })
       .catch(err => {
-        console.log(err);
+        console.error(err);
         setLoading(false);
         setAlert({
           open: true,
@@ -674,36 +635,50 @@ export default function Estimate() {
 
   const estimateDisabled = () => {
     let disabled = true;
-    const emptySelection = questions
+
+    const emptySelections = questions
+      .filter(
+        question => question.title !== 'Which features do you expect to use?'
+      )
       .map(question => question.options.filter(option => option.selected))
       .filter(question => question.length === 0);
 
+    const featureSelected = questions
+      .filter(
+        question => question.title === 'Which features do you expect to use?'
+      )
+      .map(question => question.options.filter(option => option.selected))
+      .filter(selections => selections.length > 0);
+
     if (questions.length === 2) {
-      if (emptySelection.length === 1) {
+      if (emptySelections.length === 1) {
         disabled = false;
       }
     } else if (questions.length === 1) {
       disabled = true;
-    } else if (
-      emptySelection.length < 3 &&
-      questions[questions.length - 1].option.filter(option => option.selected)
-        .length > 0
-    ) {
+    } else if (emptySelections.length === 1 && featureSelected.length > 0) {
       disabled = false;
     }
+
     return disabled;
   };
+
   const softwareSelection = (
     <Grid container direction='column'>
-      <Grid item container alignItems='center'>
+      <Grid
+        item
+        container
+        alignItems='center'
+        style={{ marginBottom: '1.25em' }}
+      >
         <Grid item xs={2}>
           <img src='/assets/check.svg' alt='checkmark' />
         </Grid>
         <Grid item xs={10}>
           <Typography variant='body1'>
-            {`You want ${service} `}
+            You want {service}
             {platforms.length > 0
-              ? `for ${
+              ? ` for ${
                   //if only web application is selected...
                   platforms.indexOf('Web Application') > -1 &&
                   platforms.length === 1
@@ -776,12 +751,14 @@ export default function Estimate() {
         </Grid>
         <Grid item xs={10}>
           <Typography variant='body1'>
-            {`The custom features will be of ${customFeatures.toLowerCase()}, and the project will be used by about ${users} users.`}
+            The custom features will be of {customFeatures.toLowerCase()}
+            {`, and the project will be used by about ${users} users.`}
           </Typography>
         </Grid>
       </Grid>
     </Grid>
   );
+
   const websiteSelection = (
     <Grid container direction='column' style={{ marginTop: '14em' }}>
       <Grid item container alignItems='center'>
@@ -790,7 +767,7 @@ export default function Estimate() {
         </Grid>
         <Grid item xs={10}>
           <Typography variant='body1'>
-            you want
+            You want{' '}
             {category === 'Basic'
               ? 'a Basic Website.'
               : `an ${category} Website.`}
@@ -816,7 +793,7 @@ export default function Estimate() {
           content='Bringing West Coast Technology to the Midwest | Free Estimate'
           key='og:title'
         />
-        <meta property='og:url' content='arc.com/estimate' key='og:url' />
+        <meta property='og:url' key='og:url' content='arc.com/estimate' />
         <link rel='canonical' key='canonical' href='arc.com/estimate' />
       </Head>
       <Grid
@@ -828,12 +805,9 @@ export default function Estimate() {
       >
         <Grid
           item
-          style={{
-            marginLeft: matchesMD ? 0 : '5em',
-            marginTop: '2em',
-          }}
+          style={{ marginTop: '2em', marginLeft: matchesMD ? 0 : '5em' }}
         >
-          <Typography variant='h2' align={matchesMD ? 'center' : undefined}>
+          <Typography variant='h1' align={matchesMD ? 'center' : undefined}>
             Estimate
           </Typography>
         </Grid>
@@ -860,10 +834,10 @@ export default function Estimate() {
           .filter(question => question.active)
           .map((question, index) => (
             <React.Fragment key={index}>
-              <Grid item>
+              <Grid item ref={myRef}>
                 <Typography
+                  variant='h1'
                   align='center'
-                  variant='h2'
                   style={{
                     fontWeight: 500,
                     fontSize: '2.25rem',
@@ -885,38 +859,34 @@ export default function Estimate() {
                 </Typography>
               </Grid>
               <Grid item container>
-                {question.options.map(option => (
+                {question.options.map((option, index) => (
                   <Grid
                     item
                     container
+                    direction='column'
+                    md
+                    key={index}
                     component={Button}
-                    //key={index}
                     onClick={() => handleSelect(option.id)}
                     style={{
-                      display: 'block',
+                      display: 'grid',
                       textTransform: 'none',
                       borderRadius: 0,
                       marginBottom: matchesSM ? '1.5em' : 0,
                       backgroundColor: option.selected
                         ? theme.palette.common.orange
-                        : undefined,
+                        : null,
                     }}
-                    direction='column'
-                    alignItems='center'
-                    md
                   >
                     <Grid item style={{ maxWidth: '14em' }}>
                       <Typography
-                        align='center'
                         variant='h6'
-                        style={{
-                          lineHeight: 1,
-                          marginBottom: '1em',
-                        }}
+                        align='center'
+                        style={{ marginBottom: '1em' }}
                       >
                         {option.title}
                       </Typography>
-                      <Typography align='center' variant='caption'>
+                      <Typography variant='caption' align='center'>
                         {option.subtitle}
                       </Typography>
                     </Grid>
@@ -932,6 +902,7 @@ export default function Estimate() {
               </Grid>
             </React.Fragment>
           ))}
+
         <Grid
           item
           container
@@ -949,14 +920,14 @@ export default function Estimate() {
                     ? '/assets/backArrowDisabled.svg'
                     : '/assets/backArrow.svg'
                 }
-                alt='previous question'
+                alt='Previous question'
               />
             </IconButton>
           </Grid>
           <Grid item>
             <IconButton
-              onClick={nextQuestion}
               disabled={navigationNextDisabled()}
+              onClick={nextQuestion}
             >
               <img
                 src={
@@ -964,7 +935,7 @@ export default function Estimate() {
                     ? '/assets/forwardArrowDisabled.svg'
                     : '/assets/forwardArrow.svg'
                 }
-                alt='next question'
+                alt='Next question'
               />
             </IconButton>
           </Grid>
@@ -972,8 +943,8 @@ export default function Estimate() {
         <Grid item>
           <Button
             variant='contained'
-            disabled={estimateDisabled()}
             className={classes.estimateButton}
+            disabled={estimateDisabled()}
             onClick={() => {
               setDialogOpen(true);
               getTotal();
@@ -981,6 +952,10 @@ export default function Estimate() {
               getFeatures();
               getCustomFeatures();
               getCategory();
+              //ReactGA.event({
+              //  category: 'Estimate',
+              //  action: 'Estimate Checked',
+              //});
             }}
           >
             Get Estimate
@@ -997,7 +972,7 @@ export default function Estimate() {
       >
         <Grid container justify='center'>
           <Grid item style={{ marginTop: '1em', marginBottom: '1em' }}>
-            <Typography variant='h2' align='center'>
+            <Typography variant='h1' align='center'>
               Estimate
             </Typography>
           </Grid>
@@ -1020,8 +995,8 @@ export default function Estimate() {
                 <TextField
                   label='Name'
                   id='name'
-                  value={name}
                   fullWidth
+                  value={name}
                   onChange={event => setName(event.target.value)}
                 />
               </Grid>
@@ -1031,43 +1006,43 @@ export default function Estimate() {
                   error={emailHelper.length !== 0}
                   helperText={emailHelper}
                   id='email'
-                  value={email}
                   fullWidth
+                  value={email}
                   onChange={onChange}
                 />
               </Grid>
               <Grid item style={{ marginBottom: '0.5em' }}>
                 <TextField
                   label='Phone'
-                  id='phone'
                   helperText={phoneHelper}
                   error={phoneHelper.length !== 0}
+                  id='phone'
                   fullWidth
                   value={phone}
                   onChange={onChange}
                 />
               </Grid>
-              <Grid item style={{ maxWidth: matchesXS ? '100%' : '20em' }}>
+              <Grid item style={{ maxWidth: '20em' }}>
                 <TextField
-                  value={message}
                   InputProps={{ disableUnderline: true }}
+                  value={message}
                   className={classes.message}
-                  placeholder='Tell us more about your project'
-                  id='message'
-                  onChange={event => setMessage(event.target.value)}
                   multiline
                   fullWidth
+                  placeholder='Tell us more about your project'
                   rows={10}
+                  id='message'
+                  onChange={event => setMessage(event.target.value)}
                 />
               </Grid>
               <Grid item>
                 <Typography
                   variant='body1'
-                  paragraph
                   align={matchesSM ? 'center' : undefined}
+                  paragraph
                   style={{ lineHeight: 1.25 }}
                 >
-                  We can create this digital solution for an estimated
+                  We can create this digital solution for an estimated{' '}
                   <span className={classes.specialText}>
                     ${total.toFixed(2)}
                   </span>
@@ -1096,6 +1071,7 @@ export default function Estimate() {
                   {questions.length > 2 ? softwareSelection : websiteSelection}
                 </Grid>
               </Hidden>
+
               <Grid item>
                 <Button
                   variant='contained'
@@ -1105,7 +1081,9 @@ export default function Estimate() {
                     name.length === 0 ||
                     message.length === 0 ||
                     phoneHelper.length !== 0 ||
-                    emailHelper.length !== 0
+                    emailHelper.length !== 0 ||
+                    email.length === 0 ||
+                    phone.length === 0
                   }
                 >
                   {loading ? (
@@ -1141,12 +1119,9 @@ export default function Estimate() {
         open={alert.open}
         message={alert.message}
         ContentProps={{ style: { backgroundColor: alert.backgroundColor } }}
-        anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'center',
-        }}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         onClose={() => setAlert({ ...alert, open: false })}
-        autoHideDuration
+        autoHideDuration={4000}
       />
     </Grid>
   );
