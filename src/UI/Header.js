@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+//import ReactGA from 'react-ga';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import useScrollTrigger from '@material-ui/core/useScrollTrigger';
@@ -18,6 +19,11 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Hidden from '@material-ui/core/Hidden';
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
+import Grow from '@material-ui/core/Grow';
+import Paper from '@material-ui/core/Paper';
+import Popper from '@material-ui/core/Popper';
+import MenuList from '@material-ui/core/MenuList';
 
 function ElevationScroll(props) {
   const { children } = props;
@@ -80,6 +86,7 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme.palette.common.blue,
     color: 'white',
     borderRadius: '0px',
+    zIndex: 1302,
   },
   menuItem: {
     ...theme.typography.tab,
@@ -128,6 +135,7 @@ export default function Header(props) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [openMenu, setOpenMenu] = useState(true);
   const [openDrawer, setOpenDrawer] = useState(false);
+  //const [previousUrl, setPreviousUrl] = useState('');
 
   const handlerChange = (e, newValue) => {
     props.setValue(newValue);
@@ -149,30 +157,31 @@ export default function Header(props) {
     setOpenMenu(false);
   };
 
+  function handleListKeyDown(event) {
+    if (event.key === 'Tab') {
+      event.preventDefault();
+      setOpen(false);
+    }
+  }
+
   const menuOptions = [
-    {
-      name: 'Services',
-      link: '/services',
-      activeIndex: 1,
-      selectedIndex: 0,
-    },
     {
       name: 'Custom Software Development',
       link: '/customsoftware',
       activeIndex: 1,
-      selectedIndex: 1,
+      selectedIndex: 0,
     },
     {
       name: 'iOS/Android App Development',
       link: '/mobileapps',
       activeIndex: 1,
-      selectedIndex: 2,
+      selectedIndex: 1,
     },
     {
       name: 'Website Development',
       link: '/websites',
       activeIndex: 1,
-      selectedIndex: 3,
+      selectedIndex: 2,
     },
   ];
 
@@ -192,6 +201,10 @@ export default function Header(props) {
   ];
 
   useEffect(() => {
+    //if (previousURL !== Windows.location.pathname) {
+    //  setPreviousURL(windows.location.pathname);
+    //  ReactGA.pageview(window.location + window.location.search);
+    //}
     [...menuOptions, ...routes].forEach(route => {
       switch (window.location.pathname) {
         case `${route.link}`:
@@ -234,6 +247,7 @@ export default function Header(props) {
             aria-owns={route.ariaOwns}
             aria-haspopup={route.ariaPopup}
             onMouseOver={route.mouseOver}
+            onMouseLeave={() => setOpenMenu(false)}
           />
         ))}
       </Tabs>
@@ -243,11 +257,69 @@ export default function Header(props) {
         className={classes.button}
         href='/estimate'
         component={Link}
-        onClick={() => props.setValue(false)}
+        onClick={() => {
+          props.setValue(false);
+          //ReactGA.event({
+          //  category: 'Estimate',
+          //  action: 'Desktop Header Pressed',
+          //});
+        }}
       >
         Free Estimate
       </Button>
-      <Menu
+      <Popper
+        placement='bottom-start'
+        open={openMenu}
+        anchorEl={anchorEl}
+        role={undefined}
+        transition
+        disablePortal
+      >
+        {({ TransitionProps, placement }) => (
+          <Grow
+            {...TransitionProps}
+            style={{
+              transformOrigin: 'top-left',
+            }}
+          >
+            <Paper classes={{ root: classes.menu }} elevation={0}>
+              <ClickAwayListener onClickAway={handleClose}>
+                <MenuList
+                  disablePadding
+                  onMouseLeave={handleClose}
+                  autoFocusItem={false}
+                  id='simple-menu'
+                  onKeyDown={handleListKeyDown}
+                  onMouseOver={() => setOpenMenu(true)}
+                >
+                  {menuOptions.map((option, i) => (
+                    <MenuItem
+                      key={`${option}${i}`}
+                      component={Link}
+                      href={option.link}
+                      classes={{ root: classes.menuItem }}
+                      onClick={event => {
+                        handleMenuItemClick(event, i);
+                        props.setValue(1);
+                        handleClose();
+                      }}
+                      selected={
+                        i === props.selectedIndex &&
+                        props.value === 1 &&
+                        window.location.pathname !== '/services'
+                      }
+                    >
+                      {option.name}
+                    </MenuItem>
+                  ))}
+                </MenuList>
+              </ClickAwayListener>
+            </Paper>
+          </Grow>
+        )}
+      </Popper>
+
+      {/*<Menu
         id='simple-menu'
         anchorEl={anchorEl}
         open={openMenu}
@@ -259,24 +331,7 @@ export default function Header(props) {
         elevation={0}
         style={{ zIndex: 1302 }}
         keepMounted
-      >
-        {menuOptions.map((option, i) => (
-          <MenuItem
-            key={`${option}${i}`}
-            component={Link}
-            href={option.link}
-            classes={{ root: classes.menuItem }}
-            onClick={event => {
-              handleMenuItemClick(event, i);
-              props.setValue(1);
-              handleClose();
-            }}
-            selected={i === props.selectedIndex && props.value === 1}
-          >
-            {option.name}
-          </MenuItem>
-        ))}
-      </Menu>
+      ></Menu>*/}
     </React.Fragment>
   );
 
@@ -319,6 +374,10 @@ export default function Header(props) {
             onClick={() => {
               setOpenDrawer(false);
               props.setValue(false);
+              //ReactGA.event({
+              //  category: 'Estimate',
+              //  action: 'Mobile Header Pressed',
+              //});
             }}
             selected={props.value === false}
             classes={{

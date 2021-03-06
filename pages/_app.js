@@ -1,4 +1,5 @@
 import React from 'react';
+//import ReactGA from 'react-ga';
 import PropTypes from 'prop-types';
 import App from 'next/app';
 import Head from 'next/head';
@@ -6,6 +7,9 @@ import { ThemeProvider } from '@material-ui/core/styles';
 import Theme from '../src/UI/Theme';
 import Header from '../src/UI/Header';
 import Footer from '../src/UI/Footer';
+import Fonts from '../src/UI/Fonts';
+
+//ReactGA.initialize();
 
 export default class MyApp extends App {
   constructor(props) {
@@ -20,7 +24,7 @@ export default class MyApp extends App {
     this.setState({ selectedIndex: index });
   };
   componentDidMount() {
-    //Fonts();
+    Fonts();
     // Remove the server-side injected CSS.
     const jssStyles = document.querySelector('#jss-server-side');
     if (jssStyles) {
