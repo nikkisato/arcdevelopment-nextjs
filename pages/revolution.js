@@ -8,7 +8,7 @@ import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 import technologyAnimation from '../src/animations/technologyAnimation/data.json';
 
-import CallToAction from '../src/ui/CallToAction';
+import CallToAction from '../src/UI/CallToAction';
 
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 
