@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-//import ReactGA from 'react-ga';
+import Router from 'next/router';
+import ReactGA from 'react-ga';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import useScrollTrigger from '@material-ui/core/useScrollTrigger';
@@ -13,8 +14,8 @@ import MenuItem from '@material-ui/core/MenuItem';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useTheme } from '@material-ui/core/styles';
 import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
-import MenuIcon from '@material-ui/icons/Menu';
 import IconButton from '@material-ui/core/IconButton';
+import MenuIcon from '@material-ui/icons/Menu';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -24,13 +25,20 @@ import Grow from '@material-ui/core/Grow';
 import Paper from '@material-ui/core/Paper';
 import Popper from '@material-ui/core/Popper';
 import MenuList from '@material-ui/core/MenuList';
+import ExpansionPanel from '@material-ui/core/ExpansionPanel';
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+import Grid from '@material-ui/core/Grid';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 function ElevationScroll(props) {
   const { children } = props;
+
   const trigger = useScrollTrigger({
     disableHysteresis: true,
     threshold: 0,
   });
+
   return React.cloneElement(children, {
     elevation: trigger ? 4 : 0,
   });
@@ -50,7 +58,6 @@ const useStyles = makeStyles(theme => ({
   logo: {
     height: '8em',
     textTransform: 'none',
-    textDecoration: 'none',
     [theme.breakpoints.down('md')]: {
       height: '7em',
     },
@@ -124,20 +131,44 @@ const useStyles = makeStyles(theme => ({
   appbar: {
     zIndex: theme.zIndex.modal + 1,
   },
+  expansion: {
+    backgroundColor: theme.palette.common.blue,
+    borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
+    '&.Mui-expanded': {
+      margin: 0,
+      borderBottom: 0,
+    },
+    '&::before': {
+      backgroundColor: 'rgba(0, 0, 0, 0)',
+    },
+  },
+  expansionDetails: {
+    padding: 0,
+    backgroundColor: theme.palette.primary.light,
+  },
+  expansionSummary: {
+    padding: '0 24px 0 16px',
+    '&:hover': {
+      backgroundColor: 'rgba(0, 0, 0, 0.08)',
+    },
+    backgroundColor: props =>
+      props.value === 1 ? 'rgba(0, 0, 0, 0.14)' : 'inherit',
+  },
 }));
 
 export default function Header(props) {
-  const classes = useStyles();
+  const classes = useStyles(props);
   const theme = useTheme();
-  const matches = useMediaQuery(theme.breakpoints.down('md'));
   const iOS = process.browser && /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const matches = useMediaQuery(theme.breakpoints.down('md'));
 
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [openMenu, setOpenMenu] = useState(true);
   const [openDrawer, setOpenDrawer] = useState(false);
-  //const [previousUrl, setPreviousUrl] = useState('');
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [openMenu, setOpenMenu] = useState(false);
 
-  const handlerChange = (e, newValue) => {
+  const [previousURL, setPreviousURL] = useState('');
+
+  const handleChange = (e, newValue) => {
     props.setValue(newValue);
   };
 
@@ -195,47 +226,38 @@ export default function Header(props) {
       ariaPopup: anchorEl ? 'true' : undefined,
       mouseOver: event => handleClick(event),
     },
-    { name: 'Revolution', link: '/revolution', activeIndex: 2 },
+    { name: 'The Revolution', link: '/revolution', activeIndex: 2 },
     { name: 'About Us', link: '/about', activeIndex: 3 },
     { name: 'Contact Us', link: '/contact', activeIndex: 4 },
   ];
 
+  const path = typeof window !== 'undefined' ? window.location.pathname : null;
+  const activeIndex = () => {
+    const found = routes.find(({ link }) => link === path);
+    const menuFound = menuOptions.find(({ link }) => link === path);
+
+    if (menuFound) {
+      props.setValue(1);
+      props.setSelectedIndex(menuFound.selectedIndex);
+    } else if (found === undefined) {
+      props.setValue(false);
+    } else {
+      props.setValue(found.activeIndex);
+    }
+  };
+
   useEffect(() => {
-    //if (previousURL !== Windows.location.pathname) {
-    //  setPreviousURL(windows.location.pathname);
-    //  ReactGA.pageview(window.location + window.location.search);
-    //}
-    [...menuOptions, ...routes].forEach(route => {
-      switch (window.location.pathname) {
-        case `${route.link}`:
-          if (props.value !== route.activeIndex) {
-            props.setValue(route.activeIndex);
-            if (
-              route.selectedIndex &&
-              route.selectedIndex !== props.selectedIndex
-            ) {
-              props.setSelectedIndex(route.selectedIndex);
-            }
-          }
-          break;
-        case '/estimate':
-          if (props.value !== 5) {
-            props.setValue(false);
-          }
-          break;
-        default:
-          break;
-      }
-    });
-  }, [props.value, menuOptions, props.selectedIndex, routes, props]);
+    activeIndex();
+    //ReactGA.pageview(window.location.pathname + window.location.search);
+  }, [path]);
 
   const tabs = (
     <React.Fragment>
       <Tabs
         value={props.value}
-        onChange={handlerChange}
+        onChange={handleChange}
         className={classes.tabContainer}
-        //  indicatorColor='primary'
+        indicatorColor='primary'
       >
         {routes.map((route, index) => (
           <Tab
@@ -252,25 +274,25 @@ export default function Header(props) {
         ))}
       </Tabs>
       <Button
+        component={Link}
+        href='/estimate'
         variant='contained'
         color='secondary'
         className={classes.button}
-        href='/estimate'
-        component={Link}
         onClick={() => {
           props.setValue(false);
-          //ReactGA.event({
-          //  category: 'Estimate',
-          //  action: 'Desktop Header Pressed',
-          //});
+          ReactGA.event({
+            category: 'Estimate',
+            action: 'Desktop Header Pressed',
+          });
         }}
       >
         Free Estimate
       </Button>
       <Popper
-        placement='bottom-start'
         open={openMenu}
         anchorEl={anchorEl}
+        placement='bottom-start'
         role={undefined}
         transition
         disablePortal
@@ -279,18 +301,18 @@ export default function Header(props) {
           <Grow
             {...TransitionProps}
             style={{
-              transformOrigin: 'top-left',
+              transformOrigin: 'top left',
             }}
           >
             <Paper classes={{ root: classes.menu }} elevation={0}>
               <ClickAwayListener onClickAway={handleClose}>
                 <MenuList
-                  disablePadding
+                  onMouseOver={() => setOpenMenu(true)}
                   onMouseLeave={handleClose}
+                  disablePadding
                   autoFocusItem={false}
                   id='simple-menu'
                   onKeyDown={handleListKeyDown}
-                  onMouseOver={() => setOpenMenu(true)}
                 >
                   {menuOptions.map((option, i) => (
                     <MenuItem
@@ -318,20 +340,20 @@ export default function Header(props) {
           </Grow>
         )}
       </Popper>
-
-      {/*<Menu
-        id='simple-menu'
+      {/* <Menu
+        id="simple-menu"
+        disableAutoFocusItem
         anchorEl={anchorEl}
         open={openMenu}
         onClose={handleClose}
         classes={{ paper: classes.menu }}
         MenuListProps={{
-          onMouseLeave: handleClose,
+          onMouseLeave: handleClose
         }}
         elevation={0}
         style={{ zIndex: 1302 }}
         keepMounted
-      ></Menu>*/}
+      ></Menu> */}
     </React.Fragment>
   );
 
@@ -347,45 +369,113 @@ export default function Header(props) {
       >
         <div className={classes.toolbarMargin} />
         <List disablePadding>
-          {routes.map(route => (
-            <ListItem
-              key={`${route}${route.activeIndex}`}
-              onClick={() => {
-                setOpenDrawer(false);
-                props.setValue(route.activeIndex);
-              }}
-              component={Link}
-              href={route.link}
-              button
-              divider
-              selected={props.value === route.activeIndex}
-              classes={{ selected: classes.drawerItemSelected }}
-            >
-              <ListItemText className={classes.drawerItem} disableTypography>
-                {route.name}
-              </ListItemText>
-            </ListItem>
-          ))}
+          {routes.map(route =>
+            route.name === 'Services' ? (
+              <ExpansionPanel
+                elevation={0}
+                key={route.name}
+                classes={{ root: classes.expansion }}
+              >
+                <ExpansionPanelSummary
+                  classes={{ root: classes.expansionSummary }}
+                  expandIcon={<ExpandMoreIcon color='secondary' />}
+                >
+                  <ListItemText
+                    className={classes.drawerItem}
+                    disableTypography
+                    style={{ opacity: props.value === 1 ? 1 : null }}
+                    onClick={() => {
+                      setOpenDrawer(false);
+                      props.setValue(route.activeIndex);
+                    }}
+                  >
+                    <Link href={route.link} color='inherit'>
+                      {route.name}
+                    </Link>
+                  </ListItemText>
+                </ExpansionPanelSummary>
+                <ExpansionPanelDetails
+                  classes={{ root: classes.expansionDetails }}
+                >
+                  <Grid container direction='column'>
+                    {menuOptions.map(route => (
+                      <Grid item>
+                        <ListItem
+                          divider
+                          key={`${route}${route.setSelectedIndex}`}
+                          button
+                          component={Link}
+                          href={route.link}
+                          selected={
+                            props.selectedIndex === route.selectedIndex &&
+                            props.value === 1 &&
+                            window.location.pathname !== '/services'
+                          }
+                          classes={{ selected: classes.drawerItemSelected }}
+                          onClick={() => {
+                            setOpenDrawer(false);
+                            props.setSelectedIndex(route.selectedIndex);
+                          }}
+                        >
+                          <ListItemText
+                            className={classes.drawerItem}
+                            disableTypography
+                          >
+                            {route.name
+                              .split(' ')
+                              .filter(word => word !== 'Development')
+                              .join(' ')}
+                            <br />
+                            <span style={{ fontSize: '0.75rem' }}>
+                              Development
+                            </span>
+                          </ListItemText>
+                        </ListItem>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </ExpansionPanelDetails>
+              </ExpansionPanel>
+            ) : (
+              <ListItem
+                divider
+                key={`${route}${route.activeIndex}`}
+                button
+                component={Link}
+                href={route.link}
+                selected={props.value === route.activeIndex}
+                classes={{ selected: classes.drawerItemSelected }}
+                onClick={() => {
+                  setOpenDrawer(false);
+                  props.setValue(route.activeIndex);
+                }}
+              >
+                <ListItemText className={classes.drawerItem} disableTypography>
+                  {route.name}
+                </ListItemText>
+              </ListItem>
+            )
+          )}
           <ListItem
-            component={Link}
-            href='/estimate'
-            button
-            divider
             onClick={() => {
               setOpenDrawer(false);
               props.setValue(false);
-              //ReactGA.event({
-              //  category: 'Estimate',
-              //  action: 'Mobile Header Pressed',
-              //});
+              ReactGA.event({
+                category: 'Estimate',
+                action: 'Mobile Header Pressed',
+              });
             }}
-            selected={props.value === false}
+            divider
+            button
+            component={Link}
             classes={{
               root: classes.drawerItemEstimate,
               selected: classes.drawerItemSelected,
             }}
+            href='/estimate'
+            selected={props.value === 5}
           >
-            <ListItemText disableTypography className={classes.drawerItem}>
+            <ListItemText className={classes.drawerItem} disableTypography>
               Free Estimate
             </ListItemText>
           </ListItem>
@@ -400,6 +490,7 @@ export default function Header(props) {
       </IconButton>
     </React.Fragment>
   );
+
   return (
     <React.Fragment>
       <ElevationScroll>
@@ -408,9 +499,9 @@ export default function Header(props) {
             <Button
               component={Link}
               href='/'
-              className={classes.logoContainer}
-              onClick={() => props.setValue(0)}
               disableRipple
+              onClick={() => props.setValue(0)}
+              className={classes.logoContainer}
               style={{ textDecoration: 'none' }}
             >
               <svg
@@ -419,7 +510,7 @@ export default function Header(props) {
                 xmlns='http://www.w3.org/2000/svg'
                 viewBox='0 0 480 139'
               >
-                <style>{`.st0{fill:none}.st1{fill:#fff}.st2{font-family:Raleway; font-weight: 100;}.st6{fill:none;stroke:#000;stroke-width:3;stroke-miterlimit:10}`}</style>
+                <style>{`.st0{fill:none}.st1{fill:#fff}.st2{font-family:Raleway; font-weight:300}.st6{fill:none;stroke:#000;stroke-width:3;stroke-miterlimit:10}`}</style>
                 <path d='M448.07-1l-9.62 17.24-8.36 14.96L369.93 139H-1V-1z' />
                 <path className='st0' d='M-1 139h479.92v.01H-1z' />
                 <text
@@ -461,12 +552,9 @@ export default function Header(props) {
                   d='M457-17l-8.93 16-9.62 17.24-8.36 14.96L369.93 139l-.01.01L361 155'
                 />
               </svg>
-
-              {/*<img alt='logo' src='/assets/logo.svg' className={classes.logo} />*/}
             </Button>
             <Hidden mdDown>{tabs}</Hidden>
-            <Hidden lgUp>{drawer} </Hidden>
-            {/*{matches ? drawer : tabs}*/}
+            <Hidden lgUp>{drawer}</Hidden>
           </Toolbar>
         </AppBar>
       </ElevationScroll>

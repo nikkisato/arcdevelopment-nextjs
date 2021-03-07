@@ -466,7 +466,7 @@ export default function Contact(props) {
           horizontal: 'center',
         }}
         onClose={() => setAlert({ ...alert, open: false })}
-        autoHideDuration
+        autoHideDuration={4000}
       />
       <Grid
         item
