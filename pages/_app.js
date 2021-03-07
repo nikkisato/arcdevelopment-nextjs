@@ -8,6 +8,10 @@ import Theme from '../src/UI/Theme';
 import Header from '../src/UI/Header';
 import Footer from '../src/UI/Footer';
 import Fonts from '../src/UI/Fonts';
+import {
+  LazyLoadImage,
+  LazyLoadComponent,
+} from 'react-lazy-load-image-component';
 
 //ReactGA.initialize();
 
@@ -56,10 +60,12 @@ export default class MyApp extends App {
             setValue={this.setValue}
             setSelectedIndex={this.setSelectedIndex}
           />
-          <Footer
-            setValue={this.setValue}
-            setSelectedIndex={this.setSelectedIndex}
-          />
+          <LazyLoadComponent threshold={400}>
+            <Footer
+              setValue={this.setValue}
+              setSelectedIndex={this.setSelectedIndex}
+            />
+          </LazyLoadComponent>
         </ThemeProvider>
       </React.Fragment>
     );
